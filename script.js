@@ -1,33 +1,96 @@
 let boxes = document.createElement("main")
+let inp = document.querySelector("input")
 let form = document.forms.reminders
-let remindersName = []
+let change = document.querySelector(".modal input")
+let modalWindow = document.querySelector(".modal")
+let modalDelWindow = document.querySelector(".modal-del")
+let deleteTask = document.querySelector(".modal-del input")
+
+let remindersName = [
+    {
+        id: Math.random(),
+        isDone: false,
+        time: "10:22",
+        task: "some task"
+    },
+    {
+        id: Math.random(),
+        isDone: true,
+        time: "10:22",
+        task: "hello world"
+    },
+]
 
 function reminders(arr, name) {
+    boxes.innerHTML = ""
+
     for (let item of arr) {
-        if (item.isDone == false && /\w/.test(name.value)) {
-            name.classList.remove("false", "fade")
-            name.classList.add("true")
+        name.classList.remove("false", "fade")
+        name.classList.add("true")
+        let boxx = document.createElement("div")
+        let box = document.createElement("div")
+        let header = document.createElement("h3")
+        let price = document.createElement("p")
+        let del = document.createElement("div")
+        let edit = document.createElement("button")
 
-            let box = document.createElement("div")
-            let header = document.createElement("h3")
-            let price = document.createElement("p")
-            let del = document.createElement("div")
+        box.id = item.id
+        header.innerHTML = item.task
+        price.innerHTML = item.time
+        edit.innerHTML = "edit"
+        del.innerHTML = "X"
 
-            box.id = item.id
-            header.innerHTML = name.value
-            price.innerHTML = item.time
-            del.innerHTML = "X"
+        if (item.isDone) {
+            box.classList.add("done")
+        }
 
-            box.classList.add("box")
-            price.classList.add("blue")
-            del.classList.add("delete")
+        boxx.classList.add("glav")
+        box.classList.add("box")
+        price.classList.add("blue")
+        del.classList.add("delete")
+        edit.classList.add("edit")
 
-            boxes.append(box)
-            box.append(header, price, del)
-            item.isDone = true
-        } else {
-            name.classList.remove("true")
-            name.classList.add("false", "fade")
+        boxes.append(boxx)
+        boxx.append(box, edit, del)
+        box.append(header, price)
+
+        box.onclick = () => {
+            item.isDone = !item.isDone
+            if(item.isDone) {
+                box.classList.add('done')
+            } else {
+                box.classList.remove('done')
+            }
+        }
+
+        del.onclick = () => {
+            modalDelWindow.style.display = "block"
+            deleteTask.nextElementSibling.onclick = () => {
+                if (deleteTask.value == item.task) {
+                    remindersName = remindersName.filter(el => el.id !== item.id)
+                    reminders(remindersName, inp)
+                } else {
+                    alert("Не правильно написали Task")
+                }
+                modalDelWindow.style.display = "none"
+            }
+        }
+
+
+        edit.onclick = () => {
+            modalWindow.style.display = "block"
+            change.nextElementSibling.onclick = () => {
+
+
+                if (change.value.length !== 0) {
+                    item.task = change.value
+                    reminders(remindersName, inp)
+                }
+                change.value = ""
+                modalWindow.style.display = "none"
+
+
+            }
         }
     }
 }
@@ -37,7 +100,6 @@ document.querySelector("hr").after(boxes)
 form.onsubmit = (event) => {
     event.preventDefault()
 
-    let inp = document.querySelector("input")
 
 
     let hours = new Date().getHours().toString()
@@ -52,10 +114,13 @@ form.onsubmit = (event) => {
     let task = {
         id: Math.random(),
         isDone: false,
-        time: hours + ":" + minut
+        time: hours + ":" + minut,
+        task: inp.value
     }
 
     remindersName.push(task)
 
     reminders(remindersName, inp)
 }
+
+reminders(remindersName, inp)
